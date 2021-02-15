@@ -126,7 +126,7 @@ class EngineClient:
         raise_exception_if_not_ok(response)
         return response.json()
 
-    def set_job_retry(self, job_id, retries=1):
+    def set_job_retry_count(self, job_id, retries=1):
         url = f"{self.engine_base_url}/job/{job_id}/retries"
         body = {"retries": retries}
 
