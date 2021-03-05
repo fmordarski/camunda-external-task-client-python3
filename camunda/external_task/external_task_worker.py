@@ -11,9 +11,9 @@ from camunda.utils.utils import get_exception_detail
 class ExternalTaskWorker:
     DEFAULT_SLEEP_SECONDS = 300
 
-    def __init__(self, worker_id, base_url=ENGINE_LOCAL_BASE_URL, config=frozendict({})):
+    def __init__(self, worker_id, base_url=ENGINE_LOCAL_BASE_URL, config=frozendict({}), auth=None):
         self.worker_id = worker_id
-        self.client = ExternalTaskClient(self.worker_id, base_url, config)
+        self.client = ExternalTaskClient(self.worker_id, auth, base_url, config)
         self.executor = ExternalTaskExecutor(self.worker_id, self.client)
         self.config = config
         self._log_with_context(f"Created new External Task Worker with config: {self.config}")

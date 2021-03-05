@@ -24,11 +24,12 @@ class ExternalTaskClient:
         "timeoutDeltaMillis": 5000,
     }
 
-    def __init__(self, worker_id, engine_base_url=ENGINE_LOCAL_BASE_URL, config=frozendict({})):
+    def __init__(self, worker_id, auth, engine_base_url=ENGINE_LOCAL_BASE_URL, config=frozendict({})):
         self.worker_id = worker_id
         self.external_task_base_url = engine_base_url + "/external-task"
         self.config = type(self).default_config.copy()
         self.config.update(config)
+        self.auth = auth
         self.is_debug = config.get('isDebug', False)
         self.http_timeout_seconds = self.config.get('httpTimeoutMillis') / 1000
         self._log_with_context(f"Created External Task client with config: {self.config}")
@@ -48,7 +49,8 @@ class ExternalTaskClient:
         if self.is_debug:
             self._log_with_context(f"trying to fetch and lock with request payload: {body}")
         http_timeout_seconds = self.__get_fetch_and_lock_http_timeout_seconds()
-        response = requests.post(url, headers=self._get_headers(), json=body, timeout=http_timeout_seconds)
+        response = requests.post(url, headers=self._get_headers(), json=body, timeout=http_timeout_seconds,
+                                 auth=self.auth)
         raise_exception_if_not_ok(response)
 
         resp_json = response.json()
@@ -79,7 +81,8 @@ class ExternalTaskClient:
             "localVariables": Variables.format(local_variables)
         }
 
-        response = requests.post(url, headers=self._get_headers(), json=body, timeout=self.http_timeout_seconds)
+        response = requests.post(url, headers=self._get_headers(), json=body, timeout=self.http_timeout_seconds,
+                                 auth=self.auth)
         raise_exception_if_not_ok(response)
         return response.status_code == HTTPStatus.NO_CONTENT
 
@@ -98,7 +101,8 @@ class ExternalTaskClient:
         if error_details:
             body["errorDetails"] = error_details
 
-        response = requests.post(url, headers=self._get_headers(), json=body, timeout=self.http_timeout_seconds)
+        response = requests.post(url, headers=self._get_headers(), json=body, timeout=self.http_timeout_seconds,
+                                 auth=self.auth)
         raise_exception_if_not_ok(response)
         return response.status_code == HTTPStatus.NO_CONTENT
 
@@ -118,7 +122,8 @@ class ExternalTaskClient:
         if self.is_debug:
             self._log_with_context(f"trying to report bpmn error with request payload: {body}")
 
-        resp = requests.post(url, headers=self._get_headers(), json=body, timeout=self.http_timeout_seconds)
+        resp = requests.post(url, headers=self._get_headers(), json=body, timeout=self.http_timeout_seconds,
+                             auth=self.auth)
         resp.raise_for_status()
         return resp.status_code == HTTPStatus.NO_CONTENT
 
