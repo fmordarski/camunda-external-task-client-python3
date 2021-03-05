@@ -24,7 +24,7 @@ class ExternalTaskClient:
         "timeoutDeltaMillis": 5000,
     }
 
-    def __init__(self, worker_id, auth, engine_base_url=ENGINE_LOCAL_BASE_URL, config=frozendict({})):
+    def __init__(self, worker_id, engine_base_url=ENGINE_LOCAL_BASE_URL, config=frozendict({}), auth=None):
         self.worker_id = worker_id
         self.external_task_base_url = engine_base_url + "/external-task"
         self.config = type(self).default_config.copy()
